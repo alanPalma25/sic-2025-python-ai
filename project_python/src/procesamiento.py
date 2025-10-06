@@ -1,4 +1,5 @@
 import pandas as pd 
+from IPython.display import display
 
 def cargar_datos(path):
     """
@@ -14,8 +15,8 @@ def cargar_datos(path):
         print(f"Cargando archivo de tipo: .{tipo_archivo}")
 
         # Cargar el archivo según su tipo
-        if tipo_archivo == "xls":
-            data = pd.read_excel(path)
+        if tipo_archivo == "xls" or tipo_archivo == "xlsx":
+            data = pd.read_excel(path, engine='openpyxl')
         else:
             data = pd.read_csv(path, delimiter=",")
 
@@ -60,21 +61,17 @@ def procesamiento(df, col_name = None):
 
     i=0
 
-    while i < (len(df["Nombre"])-1):
+    while i < len(df["Nombre"]):
         cont=0
         tiempo_dia = df.loc[i, "Diferencia en minutos"]
         personas.append(df.loc[i, "Nombre"])
         dias_trabajados.append(df.loc[i, "Date"])
-        while (df.loc[i, "Date"] == df.loc[i+cont+1, "Date"]) and (df.loc[i, "Nombre"] == df.loc[i+cont+1, "Nombre"]):
+        while ((i+cont+1) < len(df)) and (df.loc[i, "Date"] == df.loc[i+cont+1, "Date"]) and (df.loc[i, "Nombre"] == df.loc[i+cont+1, "Nombre"]):
             tiempo_dia += df.loc[i+cont+1, "Diferencia en minutos"]
             cont += 1
         tiemposDia.append(tiempo_dia)
         i += cont+1
 
-    tiempo_dia = df.loc[i, "Diferencia en minutos"]
-    tiemposDia.append(tiempo_dia)
-    personas.append(df.loc[i, "Nombre"])
-    dias_trabajados.append(df.loc[i, "Date"])
     totDATA = pd.DataFrame({"Nombre": personas, "Minutos totales por dia": tiemposDia, "Fecha": dias_trabajados})
 
     return totDATA
